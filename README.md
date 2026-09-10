@@ -28,7 +28,7 @@ GitHub Actions使用六个UTC cron表达式分别触发上述阶段。阶段间�
 - 每次响应先写仓库外原始证据目录，并在SQLite账本登记请求哈希、响应哈希、时间、尝试次数和错误码。
 - 发给DeepSeek的对象由字段白名单重建。Wind原始响应、API凭据、HTTP头、本地路径、供应商自然语言和未登记全文不能出站。
 - 报告数字由代码生成。模型正文只能引用允许的证据ID；自由数字、未知token、错误章节、URL、无历史支持的高低位/放缩量措辞和供应商资金口径越界会被拒绝。
-- DeepSeek端点固定为 `https://api.deepseek.com`，模型固定为 `deepseek-v4-flash`；模型不可用时仍生成确定性七节报告。
+- DeepSeek端点固定为 `https://api.deepseek.com`，请求模型固定为 `deepseek-v4-flash`；响应模型仅接受配置中的精确白名单（当前实测后端标识为 `deepseek-flash`），并把请求/返回标识写入审计元数据。模型不可用时仍生成确定性七节报告。
 
 ## 本地使用
 

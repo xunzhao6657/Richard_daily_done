@@ -30,6 +30,7 @@ def runtime(root: Path, *, llm_enabled: bool = False) -> RuntimeConfig:
         "data": {"wind_enabled": True, "market_overview_enabled": True, "index_crosscheck_enabled": True, "akshare_enabled": False, "max_attempts": 3, "call_timeout_seconds": 45},
         "llm": {
             "enabled": llm_enabled, "base_url": "https://api.deepseek.com", "model": "deepseek-v4-flash",
+            "accepted_response_models": ["deepseek-v4-flash", "deepseek-flash"],
             "secret_env": "DEEPSEEK_API_KEY", "temperature": 0.2, "max_tokens": 6000,
             "connect_timeout_seconds": 10, "read_timeout_seconds": 90,
             "daily_input_token_limit": 100000, "daily_output_token_limit": 20000,

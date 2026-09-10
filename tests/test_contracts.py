@@ -6,10 +6,11 @@ import unittest
 from datetime import date
 from decimal import Decimal
 from pathlib import Path
+from unittest.mock import patch
 
 from post_market_review.analysis import empirical_percentile, sentiment_temperature
 from post_market_review.calendar import CalendarError, TradingCalendar
-from post_market_review.research import ResearchError, assert_outbound_safe, validate_research
+from post_market_review.research import DeepSeekClient, ResearchError, assert_outbound_safe, validate_research
 from post_market_review.util import amount_to_yi
 from post_market_review.wind import close_crosscheck
 
@@ -17,6 +18,36 @@ from tests.helpers import runtime
 
 
 class ContractTests(unittest.TestCase):
+    def test_model_probe_accepts_only_configured_backend_alias(self) -> None:
+        class Response:
+            def __init__(self, model: str):
+                self.model = model
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *_args):
+                return False
+
+            def read(self) -> bytes:
+                return json.dumps({
+                    "model": self.model,
+                    "choices": [{"finish_reason": "stop", "message": {"content": '{"status":"ok"}'}}],
+                }).encode("utf-8")
+
+        with tempfile.TemporaryDirectory() as temporary:
+            config = runtime(Path(temporary))
+            client = DeepSeekClient(config.raw["llm"], Path(temporary) / "unused", "test", Path(temporary))
+            with patch.dict("os.environ", {"DEEPSEEK_API_KEY": "test-key"}), patch(
+                "urllib.request.urlopen", return_value=Response("deepseek-flash")
+            ):
+                self.assertEqual(client.probe()["status"], "PASS")
+            with patch.dict("os.environ", {"DEEPSEEK_API_KEY": "test-key"}), patch(
+                "urllib.request.urlopen", return_value=Response("unlisted-model")
+            ):
+                with self.assertRaisesRegex(ResearchError, "MODEL_NOT_AVAILABLE"):
+                    client.probe()
+
     def test_a01_calendar_open_closed_unknown(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             config = runtime(Path(temporary))

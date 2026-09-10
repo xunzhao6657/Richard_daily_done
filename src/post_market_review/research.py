@@ -133,11 +133,26 @@ class DeepSeekClient:
         self.prompt = prompt
         self.budget_root = budget_root
 
+    def _accepted_response_models(self) -> set[str]:
+        configured = self.config.get("accepted_response_models", [self.config["model"]])
+        return {str(item) for item in configured}
+
     def probe(self) -> dict[str, Any]:
         key = load_secret(self.config["secret_env"], self.secret_file)
+        body = {
+            "model": self.config["model"],
+            "messages": [{"role": "user", "content": "Return a JSON object whose status field is ok."}],
+            "thinking": {"type": "disabled"},
+            "response_format": {"type": "json_object"},
+            "temperature": 0,
+            "max_tokens": 64,
+            "stream": False,
+        }
         request = urllib.request.Request(
-            self.config["base_url"] + "/models",
-            headers={"Authorization": f"Bearer {key}", "Accept": "application/json"},
+            self.config["base_url"] + "/chat/completions",
+            data=json.dumps(body).encode("utf-8"),
+            method="POST",
+            headers={"Authorization": f"Bearer {key}", "Content-Type": "application/json"},
         )
         try:
             with urllib.request.urlopen(request, timeout=self.config["connect_timeout_seconds"]) as response:
@@ -146,8 +161,15 @@ class DeepSeekClient:
             raise ResearchError("AUTH_ERROR" if error.code in {401, 403} else "NETWORK_ERROR") from error
         except (urllib.error.URLError, TimeoutError, PermissionError) as error:
             raise ResearchError("NETWORK_ERROR") from error
-        if self.config["model"] not in {item.get("id") for item in payload.get("data", [])}:
+        try:
+            choice = payload["choices"][0]
+            probe_payload = json.loads(choice["message"]["content"])
+        except (KeyError, IndexError, TypeError, json.JSONDecodeError) as error:
+            raise ResearchError("INVALID_JSON_RESPONSE") from error
+        if payload.get("model") not in self._accepted_response_models():
             raise ResearchError("MODEL_NOT_AVAILABLE")
+        if choice.get("finish_reason") != "stop" or probe_payload.get("status") != "ok":
+            raise ResearchError("MODEL_PROBE_FAILED")
         return {"status": "PASS", "model": self.config["model"]}
 
     def research(self, evidence: dict[str, Any]) -> tuple[dict[str, Any], dict[str, Any]]:
@@ -188,7 +210,7 @@ class DeepSeekClient:
             raise ResearchError("NETWORK_ERROR") from error
         try:
             choice = result["choices"][0]
-            if result.get("model") != self.config["model"]:
+            if result.get("model") not in self._accepted_response_models():
                 raise ResearchError("MODEL_RESPONSE_MISMATCH")
             if choice.get("finish_reason") != "stop":
                 raise ResearchError("FINISH_REASON")

@@ -6,13 +6,13 @@
 
 - 已建立独立Python包、SQLite账本、交易日历、配置校验、数据集白名单和出站授权契约。
 - 已实测Wind `stock_get_market_realtime_analysis` 和三指数 `get_index_kline`，保存原始回执、请求哈希、响应哈希和时间。指数复核明确标记为同供应商一致性检查。
-- 已实测DeepSeek `/models`，确认账户可见 `deepseek-v4-flash`；真实收盘证据DTO调用成功，返回模型和finish reason经校验。
+- 已实测DeepSeek最小 `/chat/completions` 和真实收盘证据DTO。请求固定为 `deepseek-v4-flash`；供应商当前返回后端标识 `deepseek-flash`，两者以精确白名单关联，请求/返回标识和finish reason均审计，其他返回模型拒绝。
 - 已实现字段白名单重建、嵌套路径/凭据拦截、模型自由数字/URL/未知引用/章节错配/无历史比较语句/资金口径越界拒绝。
 - 已读取同日已发表晨报forecast并验证SHA256。当天forecast目标为未预测，因此报告显示 `NOT_PREDICTED`，没有事后设阈值。
 - 已实现七节同文档树导出Markdown、HTML和DOCX，HTML与Word使用涨红跌绿和箭头；Word四页完成逐页视觉检查。
 - 已实现READY、唯一发布、文件不覆盖、20:00至21:00发布窗口、watchdog、离线重放、离线重校验、交接包和SQLite完整性备份。
 - 已实现GitHub Actions六阶段UTC调度和Windows self-hosted runner运维脚本，workflow最小权限且只上传净化outbox。
-- 自动测试10项通过，覆盖A01、A02、A03、A04、A05、A07、A08、A10、A11、A13、A15和A19的核心条件。
+- 自动测试11项通过，覆盖A01、A02、A03、A04、A05、A07、A08、A10、A11、A13、A15和A19的核心条件，并验证DeepSeek后端标识白名单的允许与拒绝分支。
 
 ## 真实验收记录
 

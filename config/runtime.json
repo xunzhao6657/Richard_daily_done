@@ -24,6 +24,10 @@
     "enabled": true,
     "base_url": "https://api.deepseek.com",
     "model": "deepseek-v4-flash",
+    "accepted_response_models": [
+      "deepseek-v4-flash",
+      "deepseek-flash"
+    ],
     "secret_env": "DEEPSEEK_API_KEY",
     "temperature": 0.2,
     "max_tokens": 6000,

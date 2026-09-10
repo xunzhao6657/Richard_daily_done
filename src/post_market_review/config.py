@@ -60,6 +60,8 @@ def load_config(path: Path) -> RuntimeConfig:
     llm = value["llm"]
     if llm["base_url"] != "https://api.deepseek.com" or llm["model"] != "deepseek-v4-flash":
         raise ConfigError("DEEPSEEK_ENDPOINT_OR_MODEL")
+    if set(llm.get("accepted_response_models", [])) != {"deepseek-v4-flash", "deepseek-flash"}:
+        raise ConfigError("DEEPSEEK_RESPONSE_MODEL_ALLOWLIST")
     if not value["publication"]["local_only"]:
         raise ConfigError("EXTERNAL_DELIVERY_NOT_AUTHORIZED")
     root = path.resolve().parents[1]
