@@ -14,3 +14,5 @@
 {"watch_id":"W001","entity_id":"市场","hypothesis_template":"可使用fact token且不含自由数字的待验证假设","variable_id":"证据中的变量名","trigger_rule_id":null,"invalidator_rule_id":null,"evidence_ids":["F001"],"valid_until_session":"原样复制输入的next_session"}
 
 数字只能写为{{fact:F001}}或{{comparison:CMP001}}，不得直接输出阿拉伯数字、百分比、点位、金额、日期或中文数字数量。token必须同时列入evidence_ids；不能引用未知ID。不得把相关性写成因果，不得把供应商大单统计说成机构真实交易，不得把单日强势行业断言为持续主线。没有足够证据时减少claim并在limitations说明。
+
+最终复盘可能进入公开的 GitHub Pages。不得输出凭据、原始响应、账户信息、本地绝对路径、HTML/JavaScript、部署指令或外部链接；不得建议公开Evidence Pack、Forecast/Actual/Validation/Feature/Next-Day Context明细、日志或内部JSON。是否公开由报告发布层的确定性白名单决定，不由你决定。

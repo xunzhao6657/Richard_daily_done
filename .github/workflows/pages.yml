@@ -1,0 +1,77 @@
+name: Deploy reports to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "published-reports/**"
+      - "scripts/build_pages.py"
+      - "scripts/archive_pages_reports.py"
+      - ".github/workflows/pages.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
+
+      - name: Setup Python
+        uses: actions/setup-python@ece7cb06caefa5fff74198d8649806c4678c61a1 # v6
+        with:
+          python-version: "3.12"
+
+      - name: Test Pages builder
+        run: python -m unittest tests.test_build_pages
+
+      - name: Build Pages site
+        run: python scripts/build_pages.py --source published-reports --output public
+
+      - name: Verify Pages artifact
+        run: |
+          test -f public/index.html
+          test -f public/.nojekyll
+          test -f public/latest/morning.html
+          test -f public/latest/review.html
+          ! grep -RIE '(ak_|sk-)[A-Za-z0-9_-]{16,}|github_pat_|gh[pousr]_|DEEPSEEK_API_KEY|WIND_APP_SECRET|[A-Za-z]:\\(Users|finance agent)\\|file://' public
+
+      - name: Configure Pages
+        uses: actions/configure-pages@983d7736d9b0ae728b81ab479565c72886d7745b # v5
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@7b1f4a764d45c48632c6b24a0339c27f5614fb0b # v4
+        with:
+          path: public
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy Pages
+        id: deployment
+        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0febac5b3c0c03e # v4
+
+      - name: Publish dashboard links
+        if: always()
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<'EOF'
+          ## 📊 A股 Quant Research Dashboard
+
+          - Dashboard: https://xunzhao6657.github.io/Richard_daily_done/
+          - Latest Morning Brief: https://xunzhao6657.github.io/Richard_daily_done/latest/morning.html
+          - Latest Post-Market Review: https://xunzhao6657.github.io/Richard_daily_done/latest/review.html
+          EOF

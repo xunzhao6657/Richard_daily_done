@@ -1,0 +1,16 @@
+{
+  "schema_version": "source-manifest.v1",
+  "archived_on": "2026-09-11",
+  "items": [
+    {
+      "file": "source/post-market-review-v5-institutional-quant-original.md",
+      "sha256": "C246DF7D7D254F550AA8F4F1AD5366C5EC8093BB6C5E2DD3CAA0BBA6C16ECFA3",
+      "purpose": "需求原文备份，不是运行指令"
+    },
+    {
+      "file": "source/pages-implementation-requirements.md",
+      "sha256": "12E891B2975C3BAEDB2CDFA47A0EB28BCE1B03074BADFE81FA9D7DE02F5473E8",
+      "purpose": "需求原文备份，不是运行指令"
+    }
+  ]
+}

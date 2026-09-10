@@ -71,6 +71,17 @@ CLI支持 `doctor`、`collect`、`prepare`、`publish`、`watchdog`、`run`、`s
 
 runner安装脚本使用一次性注册token和下载包SHA256，并创建当前用户登录后启动的隐藏任务。该模式可以复用当前用户的Wind认证和DPAPI，但主机必须开机、联网且保持登录；关机或注销时无法保证20:00执行。使用 `scripts\github_runner_status.ps1` 检查实际进程和任务结果。
 
+## GitHub Pages研究门户
+
+统一入口为 [A股 Quant Research Dashboard](https://xunzhao6657.github.io/Richard_daily_done/)，固定地址为：
+
+- 晨报：`https://xunzhao6657.github.io/Richard_daily_done/latest/morning.html`
+- 复盘：`https://xunzhao6657.github.io/Richard_daily_done/latest/review.html`
+
+Pages采用两层独立流程。`.github/workflows/archive-reports.yml` 在北京时间08:05及复盘Workflow成功后，由现有Windows self-hosted runner扫描本地正式发布目录，只把存在`publication.json`、哈希一致、非`test`且通过敏感信息检查的最终HTML提交到`published-reports/`。`.github/workflows/pages.yml` 在Ubuntu上从完整历史重建临时`public/`并使用GitHub官方Pages Actions部署。
+
+Pages只发布HTML。Wind原始响应、Forecast/Actual/Validation/Feature/Next-Day Context JSON、日志、SQLite、DOCX、Markdown、密钥和本地路径均不进入网站；原有Actions Artifact继续保留。详细运行和恢复说明见 [docs/PAGES_OPERATIONS.md](docs/PAGES_OPERATIONS.md)。
+
 ## 目录
 
 - `src/post_market_review`：采集、校验、研究、比较、报告、发布和恢复逻辑
@@ -83,5 +94,6 @@ runner安装脚本使用一次性注册token和下载包SHA256，并创建当前
 - `REVIEW_USER_GUIDE.md`：日常操作和故障处理
 - `review_requirements_traceability.csv`：需求到代码、测试和证据的映射
 - `institutional-review.json`：每次运行的预测质量、交易质量、评分、监控和研究队列结构化工件
+- `published-reports`：经哈希和公开白名单校验的HTML历史事实层
 
 自动化研究产出不构成投资建议。

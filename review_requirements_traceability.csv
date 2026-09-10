@@ -26,3 +26,11 @@ IQ04,Forecast与Trading Quality分离,"institutional.py; report.py",Trading Qual
 IQ05,Research Queue不直接改模型,institutional.py deterministic queue,review artifact inspection,IMPLEMENTED
 IQ06,模型校准监控透传,"institutional.py; report.py",missing history remains explicit,IMPLEMENTED_WITH_LIMITS
 IQ07,结构化制度化复盘工件,"pipeline.py; schemas/review.institutional.v1.json",institutional-review.json staged and published,IMPLEMENTED
+PG01,晨报与复盘完整提示词增加Pages公开分发契约,"prompts/*.md; source/manifest.json",原文哈希归档且运行短Prompt保留严格JSON契约,IMPLEMENTED
+PG02,已发布HTML持久归档,scripts/archive_pages_reports.py; published-reports,publication与READY哈希校验,PASS
+PG03,Pages静态站点构建,scripts/build_pages.py,空目录/单类/双类/跨月/跨年/中文文件名测试,PASS
+PG04,Latest分别选择晨报和复盘,scripts/build_pages.py,test_latest_is_selected_independently_for_each_kind,PASS
+PG05,Project Pages相对链接,scripts/build_pages.py,test_project_pages_links_are_relative_and_resolve,PASS
+PG06,敏感文件与主动内容拦截,scripts/archive_pages_reports.py,test_sensitive_html_is_rejected,PASS
+PG07,官方Pages Actions独立部署,.github/workflows/pages.yml,GitHub在线部署验收待执行,IMPLEMENTED_PENDING_ONLINE
+PG08,晨报08:05和复盘完成后自动归档,.github/workflows/archive-reports.yml,workflow schedule/workflow_run/manual,IMPLEMENTED_PENDING_ONLINE

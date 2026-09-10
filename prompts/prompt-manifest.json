@@ -1,0 +1,13 @@
+{
+  "schema_version": "prompt-manifest.v1",
+  "updated_on": "2026-09-11",
+  "runtime_prompt": {
+    "path": "prompts/research-system.md",
+    "sha256": "DB63B52F4DC3E5968495DAFF9FCDBE18C64B32BEF7E6F37D54018CFC52ED0E73"
+  },
+  "governance_prompt": {
+    "path": "prompts/post-market-review-v5-institutional-quant.md",
+    "sha256": "44538B85BEE2E499717542F0C00EC71A70B8997364E33AC0875397F5D0D57FDA"
+  },
+  "public_distribution": "FINAL_HTML_ONLY"
+}
