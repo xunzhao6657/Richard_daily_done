@@ -79,6 +79,11 @@ jobs:
           & $env:PYTHON_EXE -m pip install --disable-pip-version-check -r requirements.lock
       - name: Run contract tests
         shell: powershell
+        env:
+          REVIEW_STATE_ROOT: ""
+          REVIEW_REPORT_ROOT: ""
+          MORNING_REPORT_ROOT: ""
+          DEEPSEEK_BUDGET_ROOT: ""
         run: '& $env:PYTHON_EXE -m unittest discover -s tests'
 
       - name: Resolve Beijing date and stage
