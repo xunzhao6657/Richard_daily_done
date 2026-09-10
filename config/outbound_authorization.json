@@ -1,0 +1,22 @@
+{
+  "schema_version": "outbound-authorization.v1",
+  "status": "AUTHORIZED",
+  "destination": "https://api.deepseek.com",
+  "purpose": "A-share post-market review research explanation",
+  "allowed": [
+    "normalized facts from datasets marked ALLOW_NORMALIZED_FACT",
+    "validated morning forecast display values",
+    "enumerated source status labels"
+  ],
+  "prohibited": [
+    "provider API credentials",
+    "DeepSeek API credentials",
+    "raw Wind responses",
+    "licensed full text",
+    "local filesystem paths",
+    "HTTP headers",
+    "vendor-generated narrative"
+  ],
+  "authorization_source": "explicit user authorization in the originating Codex task"
+}
+

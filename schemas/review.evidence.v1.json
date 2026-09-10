@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review.evidence.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "snapshot_hash", "report_date", "cutoff_at", "next_session", "facts", "metrics", "comparisons", "events", "allowed_section_ids", "source_states", "evidence_hash"],
+  "properties": {
+    "schema_version": {"const": "review.evidence.v1"}, "snapshot_hash": {"type": "string"},
+    "report_date": {"type": "string"}, "cutoff_at": {"type": "string"}, "next_session": {"type": ["string", "null"]},
+    "facts": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["evidence_id", "label", "display_value", "trade_date", "available_time", "source_label", "allowed_section_ids"], "properties": {"evidence_id": {"type": "string"}, "label": {"type": "string"}, "display_value": {"type": "string"}, "trade_date": {"type": "string"}, "available_time": {"type": "string"}, "source_label": {"type": "string"}, "allowed_section_ids": {"type": "array", "items": {"type": "string"}}}}},
+    "metrics": {"type": "array"}, "comparisons": {"type": "array"}, "events": {"type": "array"},
+    "allowed_section_ids": {"type": "array", "items": {"enum": ["S1", "S2", "S3", "S4", "S5", "S6"]}},
+    "source_states": {"type": "array"}, "evidence_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": "review-datasets.v1",
+  "datasets": [
+    {
+      "dataset_id": "wind_market_overview",
+      "provider": "wind",
+      "upstream": "wind-stock-research",
+      "fields": ["index_close", "index_return_pct", "market_turnover", "breadth", "industry_ranking", "stock_ranking", "limit_counts", "limit_ladder"],
+      "outbound_llm_policy": "ALLOW_NORMALIZED_FACT",
+      "raw_outbound": false
+    },
+    {
+      "dataset_id": "wind_index_crosscheck",
+      "provider": "wind",
+      "upstream": "wind-index-data",
+      "fields": ["open", "high", "low", "close"],
+      "outbound_llm_policy": "LOCAL_AUDIT_ONLY",
+      "raw_outbound": false
+    },
+    {
+      "dataset_id": "morning_forecast",
+      "provider": "local-publication",
+      "upstream": "morning-brief",
+      "fields": ["immutable_forecast", "publication_hash"],
+      "outbound_llm_policy": "ALLOW_VALIDATED_DISPLAY_ONLY",
+      "raw_outbound": false
+    }
+  ]
+}
+

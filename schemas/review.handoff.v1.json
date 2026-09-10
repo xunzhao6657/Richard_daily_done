@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review.handoff.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "review_publication_id", "review_sha256", "review_run_id", "next_session", "available_at", "watch_items", "evidence_refs", "limitations", "expires_at", "handoff_hash"],
+  "properties": {
+    "schema_version": {"const": "review.handoff.v1"}, "review_publication_id": {"type": "string"}, "review_sha256": {"type": "string"},
+    "review_run_id": {"type": "string"}, "next_session": {"type": ["string", "null"]}, "available_at": {"type": "string"},
+    "watch_items": {"type": "array"}, "evidence_refs": {"type": "array", "items": {"type": "string"}},
+    "limitations": {"type": "array", "items": {"type": "string"}}, "expires_at": {"type": ["string", "null"]},
+    "handoff_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

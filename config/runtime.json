@@ -1,0 +1,43 @@
+{
+  "schema_version": "review-runtime.v1",
+  "timezone": "Asia/Shanghai",
+  "windows_timezone": "China Standard Time",
+  "mode": "shadow",
+  "schedule": {
+    "collect_at": "19:15:00",
+    "freeze_at": "19:45:00",
+    "llm_deadline": "19:54:00",
+    "ready_deadline": "19:57:00",
+    "publish_at": "20:00:00",
+    "watchdog_at": "20:02:00",
+    "max_late_minutes": 60
+  },
+  "data": {
+    "wind_enabled": true,
+    "market_overview_enabled": true,
+    "index_crosscheck_enabled": true,
+    "akshare_enabled": false,
+    "max_attempts": 3,
+    "call_timeout_seconds": 45
+  },
+  "llm": {
+    "enabled": true,
+    "base_url": "https://api.deepseek.com",
+    "model": "deepseek-v4-flash",
+    "secret_env": "DEEPSEEK_API_KEY",
+    "temperature": 0.2,
+    "max_tokens": 6000,
+    "connect_timeout_seconds": 10,
+    "read_timeout_seconds": 90,
+    "daily_input_token_limit": 100000,
+    "daily_output_token_limit": 20000,
+    "review_input_token_limit": 40000,
+    "review_output_token_limit": 12000
+  },
+  "publication": {
+    "slot": "20:00",
+    "local_only": true,
+    "upload_sanitized_artifact": true,
+    "overwrite": false
+  }
+}

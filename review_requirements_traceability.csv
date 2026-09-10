@@ -1,0 +1,21 @@
+requirement_id,requirement,implementation,test_or_evidence,status
+R01,交易日20点自动复盘,.github/workflows/daily-review.yml; calendar.py,A01; six cron routes,IMPLEMENTED
+R02,19点45冻结与晚到隔离,pipeline.py make_snapshot,A07; real LATE_CAPTURE,IMPLEMENTED
+R03,Wind严谨主源与原始回执,wind.py; store.py,real run 2026-09-09,IMPLEMENTED
+R04,双源偏差边界且同源不冒充独立,wind.py close_crosscheck,A04,IMPLEMENTED
+R05,单位和日期严格校验,util.py; wind.py,A05; real DATE/MARKET_CLOSED validation,IMPLEMENTED
+R06,情绪五因子60日公式,analysis.py sentiment_temperature,A08,IMPLEMENTED_DATA_PENDING
+R07,晨报已发表forecast hash对照,comparison.py,A10; real PUBLISHED_HASH_VERIFIED,IMPLEMENTED
+R08,DeepSeek V4 Flash固定模型,research.py; config/runtime.json,doctor model probe PASS,IMPLEMENTED
+R09,凭据原始响应路径不得出站,research.py; outbound_authorization.json,A13; report scan,IMPLEMENTED
+R10,模型不得自由写数字,research.py validate_research,A11; real claim rejection,IMPLEMENTED
+R11,七节同源三格式,report.py,A02; 4-page visual inspection,IMPLEMENTED
+R12,LLM失败确定性回退,pipeline.py,A03,IMPLEMENTED
+R13,20点唯一发布且不覆盖,pipeline.py; store.py,A15; A21 rule,IMPLEMENTED
+R14,离线重放和备份,pipeline.py replay; cli.py backup,A19,IMPLEMENTED
+R15,次日观察交接,pipeline.py handoff; schemas/review.handoff.v1.json,real handoff artifact,IMPLEMENTED
+R16,补评不修改旧发表,cli.py reconcile,manual inspection,IMPLEMENTED_CONSERVATIVE
+R17,Windows runner运维,scripts/install_github_runner.ps1; status/disable/enable/uninstall scripts,ASCII source check,IMPLEMENTED
+R18,连续三交易日观察,IMPLEMENTATION_STATUS_REVIEW.md,elapsed applicable days,NOT_YET_OBSERVED
+R19,新闻公告两融北向港股,config/datasets.json; report missing state,source not registered,DEFERRED
+R20,申万一级全行业榜,report limitation; datasets policy,Wind classification is not verified SW1,DEFERRED

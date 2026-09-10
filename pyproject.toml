@@ -1,0 +1,17 @@
+[build-system]
+requires = ["setuptools>=75"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "richard-daily-done"
+version = "1.0.0"
+description = "Auditable A-share post-market review workflow"
+requires-python = ">=3.11"
+dependencies = ["python-docx==1.2.0"]
+
+[project.scripts]
+post-market-review = "post_market_review.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+

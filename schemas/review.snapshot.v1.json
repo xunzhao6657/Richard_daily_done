@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review.snapshot.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "run_id", "report_date", "cutoff_at", "created_at", "mode", "cutoff_status", "market", "observations", "derived_metrics", "source_states", "snapshot_hash"],
+  "properties": {
+    "schema_version": {"const": "review.snapshot.v1"},
+    "run_id": {"type": "string"},
+    "report_date": {"type": "string", "format": "date"},
+    "cutoff_at": {"type": "string", "format": "date-time"},
+    "created_at": {"type": ["string", "null"], "format": "date-time"},
+    "mode": {"enum": ["shadow", "production"]},
+    "cutoff_status": {"enum": ["ON_TIME", "LATE_CAPTURE", "NOT_EVALUATED"]},
+    "market": {"type": ["object", "null"]},
+    "observations": {"type": "array", "items": {"$ref": "#/$defs/observation"}},
+    "derived_metrics": {"type": "array", "items": {"type": "object"}},
+    "source_states": {"type": "array", "items": {"$ref": "#/$defs/source_state"}},
+    "snapshot_hash": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  },
+  "$defs": {
+    "observation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["observation_id", "dataset_id", "instrument_id", "field", "value_decimal", "unit", "currency", "trade_date", "period", "event_time", "publish_time", "vendor_time", "first_seen_at", "ingest_time", "available_time", "provider", "upstream", "source_locator", "raw_sha256", "universe_id", "definition_version", "revision_id", "quality_status", "reason_codes"],
+      "properties": {
+        "observation_id": {"type": "string"}, "dataset_id": {"type": "string"}, "instrument_id": {"type": "string"},
+        "field": {"type": "string"}, "value_decimal": {"type": "string"}, "unit": {"type": "string"},
+        "currency": {"type": ["string", "null"]}, "trade_date": {"type": "string", "format": "date"}, "period": {"type": "string"},
+        "event_time": {"type": "string", "format": "date-time"}, "publish_time": {"type": ["string", "null"]},
+        "vendor_time": {"type": "string"}, "first_seen_at": {"type": "string"}, "ingest_time": {"type": "string"}, "available_time": {"type": "string"},
+        "provider": {"type": "string"}, "upstream": {"type": "string"}, "source_locator": {"type": "string"},
+        "raw_sha256": {"type": ["string", "null"]}, "universe_id": {"type": "string"}, "definition_version": {"type": "string"},
+        "revision_id": {"type": "string"}, "quality_status": {"enum": ["VALID", "CONFLICT", "NOT_AVAILABLE", "NOT_COMPARABLE"]},
+        "reason_codes": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "source_state": {
+      "type": "object",
+      "required": ["provider", "status", "reason"],
+      "properties": {"provider": {"type": "string"}, "status": {"type": "string"}, "reason": {"type": "string"}},
+      "additionalProperties": true
+    }
+  }
+}

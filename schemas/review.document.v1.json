@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review.document.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "title", "report_date", "status", "narrative_status", "cutoff_at", "created_at", "sections", "source_notes", "limitations"],
+  "properties": {
+    "schema_version": {"const": "review.document.v1"}, "title": {"type": "string"}, "report_date": {"type": "string"},
+    "status": {"enum": ["COMPLETE", "PARTIAL", "FAILURE_BULLETIN"]}, "narrative_status": {"enum": ["DEEPSEEK_VALIDATED", "TEMPLATE_FALLBACK"]},
+    "cutoff_at": {"type": "string"}, "created_at": {"type": "string"},
+    "sections": {"type": "array", "minItems": 7, "maxItems": 7, "items": {"type": "object", "additionalProperties": false, "required": ["section_id", "title", "paragraphs", "tables"], "properties": {"section_id": {"enum": ["S1", "S2", "S3", "S4", "S5", "S6", "S7"]}, "title": {"type": "string"}, "paragraphs": {"type": "array", "items": {"type": "string"}}, "tables": {"type": "array"}}}},
+    "source_notes": {"type": "array", "items": {"type": "string"}}, "limitations": {"type": "array", "items": {"type": "string"}}
+  }
+}

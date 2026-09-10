@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review.publication.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "publication_id", "report_type", "report_date", "slot", "mode", "run_id", "published_at", "late", "status", "artifact_hashes", "source_snapshot_hash", "forecast_ref", "revision_of"],
+  "properties": {
+    "schema_version": {"const": "review.publication.v1"}, "publication_id": {"type": "string"}, "report_type": {"const": "post_market_review"},
+    "report_date": {"type": "string"}, "slot": {"const": "20:00"}, "mode": {"enum": ["shadow", "production"]}, "run_id": {"type": "string"},
+    "published_at": {"type": "string"}, "late": {"type": "boolean"}, "status": {"enum": ["COMPLETE", "PARTIAL", "FAILURE_BULLETIN"]},
+    "artifact_hashes": {"type": "object", "additionalProperties": {"type": "string"}}, "source_snapshot_hash": {"type": "string"},
+    "forecast_ref": {"type": ["object", "null"]}, "revision_of": {"type": ["string", "null"]}
+  }
+}

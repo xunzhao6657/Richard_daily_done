@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.runtime/
+state/
+data/raw/
+*.key
+*.dpapi
+.env
+daily-reports/
+rendered/
+

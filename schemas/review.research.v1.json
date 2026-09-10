@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review.research.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["prompt_version", "evidence_hash", "claims", "watch_items", "limitations"],
+  "properties": {
+    "prompt_version": {"const": "review.research.v1"}, "evidence_hash": {"type": "string"},
+    "claims": {"type": "array", "items": {"$ref": "#/$defs/claim"}},
+    "watch_items": {"type": "array", "items": {"$ref": "#/$defs/watch"}},
+    "limitations": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "claim": {"type": "object", "additionalProperties": false, "required": ["claim_id", "section_id", "claim_type", "text_template", "evidence_ids", "uncertainties", "causal_strength"], "properties": {"claim_id": {"type": "string"}, "section_id": {"enum": ["S1", "S2", "S3", "S4", "S5", "S6"]}, "claim_type": {"enum": ["FACT_SUMMARY", "INTERPRETATION", "HYPOTHESIS", "RISK"]}, "text_template": {"type": "string"}, "evidence_ids": {"type": "array", "items": {"type": "string"}}, "uncertainties": {"type": "array", "items": {"type": "string"}}, "causal_strength": {"enum": ["DESCRIPTIVE", "ASSOCIATION", "HYPOTHESIS"]}}},
+    "watch": {"type": "object", "additionalProperties": false, "required": ["watch_id", "entity_id", "hypothesis_template", "variable_id", "trigger_rule_id", "invalidator_rule_id", "evidence_ids", "valid_until_session"], "properties": {"watch_id": {"type": "string"}, "entity_id": {"type": "string"}, "hypothesis_template": {"type": "string"}, "variable_id": {"type": "string"}, "trigger_rule_id": {"type": ["string", "null"]}, "invalidator_rule_id": {"type": ["string", "null"]}, "evidence_ids": {"type": "array", "items": {"type": "string"}}, "valid_until_session": {"type": ["string", "null"]}}}
+  }
+}
