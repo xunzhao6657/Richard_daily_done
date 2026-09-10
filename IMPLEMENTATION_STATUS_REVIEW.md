@@ -9,17 +9,20 @@
 - 已实测DeepSeek最小 `/chat/completions` 和真实收盘证据DTO。请求固定为 `deepseek-v4-flash`；供应商当前返回后端标识 `deepseek-flash`，两者以精确白名单关联，请求/返回标识和finish reason均审计，其他返回模型拒绝。
 - 已实现字段白名单重建、嵌套路径/凭据拦截、模型自由数字/URL/未知引用/章节错配/无历史比较语句/资金口径越界拒绝。
 - 已读取同日已发表晨报forecast并验证SHA256。当天forecast目标为未预测，因此报告显示 `NOT_PREDICTED`，没有事后设阈值。
+- 已兼容 `forecast.v2` 的嵌套 `target.values`，并修正收益率decimal return及成交额元/亿元换算；每个可评价目标生成适用的Proper Scoring。
+- 已把Forecast Quality与Trading Quality分离。没有真实执行数据时交易质量明确为 `NOT_EVALUATED`，不再合并成单一总分。
+- 已生成独立 `institutional-review.json`，包含模型身份、Calibration、Monitoring和确定性Research Queue；队列只提出必需回测，不直接修改模型。
 - 已实现七节同文档树导出Markdown、HTML和DOCX，HTML与Word使用涨红跌绿和箭头；Word四页完成逐页视觉检查。
 - 已实现READY、唯一发布、文件不覆盖、20:00至21:00发布窗口、watchdog、离线重放、离线重校验、交接包和SQLite完整性备份。
 - 已实现GitHub Actions六阶段UTC调度和Windows self-hosted runner运维脚本，workflow最小权限且只上传净化outbox。
-- 自动测试11项通过，覆盖A01、A02、A03、A04、A05、A07、A08、A10、A11、A13、A15和A19的核心条件，并验证DeepSeek后端标识白名单的允许与拒绝分支。
+- 自动测试12项通过，覆盖A01、A02、A03、A04、A05、A07、A08、A10、A11、A13、A15和A19的核心条件，并验证DeepSeek后端标识白名单、`forecast.v2`单位换算、区间评分和方向分类分支。
 
 ## 真实验收记录
 
 |项目|结果|
 |---|---|
 |交易日|2026-09-09|
-|最终影子运行|`revalidated-8b834bd78b3c4016a55370105eb634f1`|
+|最终影子运行|`revalidated-5e80e4410e8d4414adc2d3f353f29eae`|
 |Wind市场主源|OK|
 |Wind三指数同源复核|OK，SAME_PROVIDER_NOT_INDEPENDENT|
 |晨报forecast|OK，PUBLISHED_HASH_VERIFIED|
@@ -37,6 +40,7 @@
 - 行业榜是Wind行业板块口径，尚未验证为申万一级全样本，报告明确保留该限制。
 - 新闻、公告、两融、北向和港股数据集未登记为本版本自动源，对应能力不补写。
 - 当前只有一次真实影子报告，尚未完成连续3个适用交易日的定时稳定性观察，因此不能声明调度SLA已验收。
+- 本次重校验使用旧运行保存的审计输入；旧审计没有保存完整 `forecast.v2`，因此该历史成品无法补算评分。后续正常运行会直接保存新制度化工件。
 - GitHub runner、仓库Variables和默认分支Actions已经完成实机验收；仍需以连续交易日观察确认长期调度稳定性。
 
 ## GitHub在线部署
@@ -46,7 +50,7 @@
 - self-hosted runner `LAPTOP-B1VMJBGF-richard-daily` 已在线，标签为 `self-hosted`、`Windows`、`X64`、`post-market-review`。
 - 首次验证发现 `setup-python` 在低权限runner上等待系统安装，因此已取消该运行；工作流改用 `PYTHON_EXE` 指向已验证的本机运行时，避免每日管理员安装与解释器下载。
 - 第二次验证发现系统只有Windows PowerShell，工作流已改用 `powershell`；随后把合同测试状态与生产账本隔离，避免测试读到历史发布记录。
-- GitHub doctor运行 [`34440514850`](https://github.com/xunzhao6657/Richard_daily_done/actions/runs/34440514850) 已成功完成：检出、Python、锁定依赖、11项合同测试、北京时间路由、DPAPI、Wind入口、状态目录和DeepSeek真实探测全部通过。
+- GitHub doctor运行 [`34440514850`](https://github.com/xunzhao6657/Richard_daily_done/actions/runs/34440514850) 已成功完成：检出、Python、锁定依赖、11项合同测试、北京时间路由、DPAPI、Wind入口、状态目录和DeepSeek真实探测全部通过。Institutional Quant升级提交后的12项测试和在线复验记录将在本次发布后更新。
 - runner在成功作业后已恢复 `online` 且空闲；连续3个适用交易日观察仍未完成。
 
 专业能力以可核验证据、透明缺失和可重放规则为准，测试通过不代表投资判断经过收益验证。

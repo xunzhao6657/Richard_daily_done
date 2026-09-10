@@ -19,3 +19,10 @@ R17,Windows runner运维,scripts/install_github_runner.ps1; status/disable/enabl
 R18,连续三交易日观察,IMPLEMENTATION_STATUS_REVIEW.md,elapsed applicable days,NOT_YET_OBSERVED
 R19,新闻公告两融北向港股,config/datasets.json; report missing state,source not registered,DEFERRED
 R20,申万一级全行业榜,report limitation; datasets policy,Wind classification is not verified SW1,DEFERRED
+IQ01,forecast.v2兼容与唯一预测事实,"comparison.py; institutional.py",nested target.values and immutable hash test,IMPLEMENTED
+IQ02,收益率及成交额单位显式换算,institutional.py actual_market_values,TestComparison test_actual_unit_conversion,PASS
+IQ03,Proper Scoring逐目标输出,"comparison.py; institutional.py",Pinball/Coverage/Width/Winkler/Brier/LogLoss test,PASS
+IQ04,Forecast与Trading Quality分离,"institutional.py; report.py",Trading Quality without execution evidence is NOT_EVALUATED,PASS
+IQ05,Research Queue不直接改模型,institutional.py deterministic queue,review artifact inspection,IMPLEMENTED
+IQ06,模型校准监控透传,"institutional.py; report.py",missing history remains explicit,IMPLEMENTED_WITH_LIMITS
+IQ07,结构化制度化复盘工件,"pipeline.py; schemas/review.institutional.v1.json",institutional-review.json staged and published,IMPLEMENTED

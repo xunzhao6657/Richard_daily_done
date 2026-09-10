@@ -2,10 +2,10 @@ from __future__ import annotations
 
 import json
 from datetime import date
-from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
+from .institutional import actual_market_values, score_target
 from .util import sha256_bytes
 
 
@@ -42,16 +42,6 @@ def load_morning_forecast(root: Path | None, report_date: str, mode: str) -> tup
     return None, {"provider": "morning-forecast", "status": "NOT_AVAILABLE", "reason": "NO_PUBLISHED_FORECAST"}
 
 
-def _actual_market(market: dict[str, Any]) -> dict[str, Decimal]:
-    actual: dict[str, Decimal] = {"turnover": Decimal(market["turnover_yi"])}
-    for item in market["indexes"]:
-        if item["windcode"] == "000001.SH":
-            actual["sse_close"] = Decimal(item["close"])
-            actual["sse_return"] = Decimal(item["return_pct"])
-            actual["sse_direction"] = Decimal(item["return_pct"])
-    return actual
-
-
 def compare_forecast(forecast: dict[str, Any] | None, market: dict[str, Any] | None, source: dict[str, Any]) -> list[dict[str, Any]]:
     target_names = ["sse_return", "sse_close", "sse_direction", "turnover", "style", "sector_rank", "fund_flow", "hsi_return", "hsi_close", "scenario"]
     if forecast is None:
@@ -60,7 +50,7 @@ def compare_forecast(forecast: dict[str, Any] | None, market: dict[str, Any] | N
             "forecast_display": "未取得已发表晨报预测", "actual_display": "未比较",
             "verdict": "NA", "reason_codes": [source["reason"]], "is_preliminary": True,
         } for index, target in enumerate(target_names, 1)]
-    actuals = _actual_market(market) if market else {}
+    actuals, actual_display = actual_market_values(market)
     comparisons: list[dict[str, Any]] = []
     for index, target_id in enumerate(target_names, 1):
         target = forecast.get("targets", {}).get(target_id, {})
@@ -76,24 +66,17 @@ def compare_forecast(forecast: dict[str, Any] | None, market: dict[str, Any] | N
         else:
             display_values = target.get("display_values", {})
             comparison["forecast_display"] = str(display_values)
-            comparison["actual_display"] = str(actuals[target_id])
+            comparison["actual_display"] = actual_display[target_id]
             comparison["status"] = "MEASURED"
-            if target_id in {"sse_return", "sse_close", "turnover"} and target.get("q50") is not None:
-                predicted = Decimal(str(target["q50"]))
-                error = actuals[target_id] - predicted
+            metrics = score_target(target, actuals[target_id])
+            comparison["metrics"] = metrics
+            if metrics.get("mae") is not None:
                 comparison["verdict"] = "OBJECTIVE_ERROR_ONLY"
-                comparison["error"] = str(error)
                 comparison["reason_codes"] = ["NO_PREREGISTERED_HIT_THRESHOLD"]
-            elif target_id == "sse_direction":
-                probabilities = target.get("probabilities", {})
-                predicted_direction = max(probabilities, key=probabilities.get) if probabilities else None
-                actual_direction = "up" if actuals[target_id] > 0 else "down" if actuals[target_id] < 0 else "flat"
-                comparison["verdict"] = "HIT" if predicted_direction == actual_direction else "MISS"
-                comparison["predicted_direction"] = predicted_direction
-                comparison["actual_direction"] = actual_direction
+            elif metrics.get("predicted_class"):
+                comparison["verdict"] = "HIT" if metrics["predicted_class"] == metrics["actual_class"] else "MISS"
             else:
                 comparison["verdict"] = "NA"
-                comparison["reason_codes"] = ["RULE_UNAVAILABLE"]
+                comparison["reason_codes"] = [metrics.get("reason", "RULE_UNAVAILABLE")]
         comparisons.append(comparison)
     return comparisons
-

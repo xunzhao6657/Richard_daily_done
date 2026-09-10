@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "review.institutional.v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schema_version", "forecast_schema_version", "forecast_quality", "daily_metrics", "trading_quality", "model_identity", "calibration", "model_monitoring", "research_queue", "governance_limitations"],
+  "properties": {
+    "schema_version": {"const": "review.institutional.v1"},
+    "forecast_schema_version": {"type": ["string", "null"]},
+    "forecast_quality": {"enum": ["MEASURED", "NOT_EVALUATED"]},
+    "daily_metrics": {"type": "array", "items": {"type": "object"}},
+    "trading_quality": {"type": "object", "additionalProperties": false, "required": ["status", "reason"], "properties": {"status": {"const": "NOT_EVALUATED"}, "reason": {"type": "string"}}},
+    "model_identity": {"type": "object"},
+    "calibration": {"type": "object"},
+    "model_monitoring": {"type": "object"},
+    "research_queue": {"type": "array", "items": {"type": "object", "additionalProperties": false, "required": ["queue_id", "target_id", "error_type", "issue", "evidence", "hypothesis", "proposed_change", "required_backtest", "priority", "status"], "properties": {"queue_id": {"type": "string"}, "target_id": {"type": "string"}, "error_type": {"enum": ["D", "L", "E", "R", "S", "M", "C", "P", "F", "O", "X"]}, "issue": {"type": "string"}, "evidence": {"type": "object"}, "hypothesis": {"type": "string"}, "proposed_change": {"type": "string"}, "required_backtest": {"type": "string"}, "priority": {"enum": ["P0", "P1", "P2", "P3"]}, "status": {"const": "OPEN"}}}},
+    "governance_limitations": {"type": "array", "items": {"type": "string"}}
+  }
+}

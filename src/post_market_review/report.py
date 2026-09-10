@@ -35,6 +35,7 @@ def build_document(
     claims: list[dict[str, Any]],
     watch_items: list[dict[str, Any]],
     rejections: list[str],
+    institutional: dict[str, Any],
 ) -> dict[str, Any]:
     fact_by_id = _fact_map(facts)
     claim_sections: dict[str, list[str]] = defaultdict(list)
@@ -76,7 +77,24 @@ def build_document(
         elif section_id == "S4":
             rows = [[item["target_id"], item["forecast_display"], item["actual_display"], item["verdict"], "、".join(item["reason_codes"])] for item in comparisons]
             section["tables"].append({"headers": ["预测维度", "晨报预测", "实际走势", "初步判定", "说明"], "rows": rows})
-            section["paragraphs"].append("本节仅做初步对照；正式评价由独立评价流程按预登记规则完成。")
+            metric_rows = []
+            for item in institutional["daily_metrics"]:
+                for metric in ("mae", "squared_error", "brier", "log_loss", "pinball", "coverage", "interval_width", "winkler"):
+                    if item.get(metric) is not None:
+                        metric_rows.append([item["target_id"], metric, format(float(item[metric]), ".6g"), "Daily"])
+            if metric_rows:
+                section["tables"].append({"headers": ["预测维度", "Institutional Metric", "当日值", "窗口"], "rows": metric_rows})
+            section["paragraphs"].extend([
+                f"Forecast Quality：{institutional['forecast_quality']}。",
+                f"Trading Quality：{institutional['trading_quality']['status']}（{institutional['trading_quality']['reason']}）。",
+                "当日分数仅是已发表预测与成熟实际值的客观记录；正式模型资格仍由滚动OOS、基准、校准和稳定性门禁决定。",
+            ])
+            if institutional.get("model_identity"):
+                model = institutional["model_identity"]
+                section["paragraphs"].append(f"模型身份：{model.get('model_id') or '未加载'}；版本：{model.get('model_version') or '未登记'}；OOS：{model.get('oos_status', 'NOT_EVALUATED')}。")
+            if institutional.get("calibration"):
+                calibration = institutional["calibration"]
+                section["paragraphs"].append(f"校准状态：概率={calibration.get('probability', 'NOT_EVALUATED')}；分位={calibration.get('quantile', 'NOT_EVALUATED')}；Conformal={calibration.get('conformal', 'NOT_EVALUATED')}。")
         elif section_id == "S5":
             section["paragraphs"].append("当前未启用具备精确发布时间和外发许可的消息源，本节不以新闻摘要补写盘面原因。")
         elif section_id == "S6":
@@ -92,10 +110,16 @@ def build_document(
                     section["paragraphs"].append("观察上涨家数与下跌家数是否改善，验证市场广度变化。〔证据：" + breadth + "〕")
             else:
                 section["paragraphs"].append("缺少合格市场事实，本次不生成次日观察项。")
+            if institutional["research_queue"]:
+                section["paragraphs"].append("Research Queue仅创建待回测假设，不直接修改下一交易日预测：")
+                for item in institutional["research_queue"]:
+                    section["paragraphs"].append(f"[{item['error_type']}] {item['target_id']}：{item['issue']}；验证要求：{item['required_backtest']}。")
         elif section_id == "S7":
             rows = [[item["provider"], item["status"], item["reason"]] for item in snapshot["source_states"]]
             rows.append(["DeepSeek", manifest["narrative_status"], manifest.get("llm_error", "")])
             section["tables"].append({"headers": ["数据源或组件", "状态", "说明"], "rows": rows})
+            monitoring = institutional.get("model_monitoring", {})
+            section["paragraphs"].append(f"模型监控：{monitoring.get('status', 'NOT_EVALUATED')}；漂移：{monitoring.get('drift', 'NOT_EVALUATED')}；重训：{monitoring.get('retraining_status', 'NOT_SCHEDULED')}。")
             section["paragraphs"].append("数据来源于 Wind Alice 万得金融数据服务。自动化研究产出，不构成投资建议。")
         section["paragraphs"].extend(claim_sections.get(section_id, []))
         sections.append(section)
@@ -105,6 +129,7 @@ def build_document(
     if rejections:
         limitations.append(f"DeepSeek输出中有{len(rejections)}条未通过结构或证据校验，未进入正文。")
     limitations.append("行业榜为Wind行业板块口径；未验证为申万一级行业。")
+    limitations.extend(institutional["governance_limitations"])
     return {
         "schema_version": "review.document.v1",
         "title": f"{int(manifest['report_date'][0:4])}年{int(manifest['report_date'][5:7])}月{int(manifest['report_date'][8:10])}日A股每日收盘复盘",

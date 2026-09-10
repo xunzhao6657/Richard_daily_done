@@ -2,6 +2,8 @@
 
 这是一个面向A股交易日的可审计盘后复盘系统。它在北京时间20:00发布Markdown、HTML和Word三件套，以Wind结构化收盘事实为主源，将同日已发表晨报的不可变预测作初步对照，再让DeepSeek V4 Flash只解释通过白名单、时间截点和证据校验的数据。
 
+系统已兼容晨报 `forecast.v2`：从 `target.values` 读取唯一预测数值，显式处理收益率小数与展示百分比、成交额元与亿元的换算，并生成独立的 Proper Scoring、模型监控和 Research Queue 工件。Forecast Quality 与 Trading Quality 分开；没有真实仓位、订单、成交、费用和流动性记录时，后者保持 `NOT_EVALUATED`。
+
 系统默认不补数。炸板率或严格60日同口径历史不完整时，情绪温度计返回空值；没有精确发布时间和授权范围的新闻源时，消息章节说明未获取；只有单日行业榜时只称“当日强势/弱势”，不判断持续主线。
 
 ## 工作流
@@ -11,10 +13,10 @@
    │  原始响应本地归档，记录SHA256与回执
 19:40 刷新并构建快照
    │  19:45证据冻结，晚到数据标记LATE_CAPTURE
-   │  确定性计算与晨报hash校验
+   │  确定性计算、晨报hash与forecast.v2校验
    │  DeepSeek白名单DTO → claim/watch逐条校验
 19:57 READY
-   │  同一文档树导出MD / HTML / DOCX
+   │  同一文档树导出MD / HTML / DOCX及institutional-review.json
 20:00 唯一发布
    │  不覆盖同名文件，账本唯一键防重复
 20:02 watchdog　20:15账本备份　次日06:30补评检查
@@ -29,6 +31,8 @@ GitHub Actions使用六个UTC cron表达式分别触发上述阶段。阶段间�
 - 发给DeepSeek的对象由字段白名单重建。Wind原始响应、API凭据、HTTP头、本地路径、供应商自然语言和未登记全文不能出站。
 - 报告数字由代码生成。模型正文只能引用允许的证据ID；自由数字、未知token、错误章节、URL、无历史支持的高低位/放缩量措辞和供应商资金口径越界会被拒绝。
 - DeepSeek端点固定为 `https://api.deepseek.com`，请求模型固定为 `deepseek-v4-flash`；响应模型仅接受配置中的精确白名单（当前实测后端标识为 `deepseek-flash`），并把请求/返回标识写入审计元数据。模型不可用时仍生成确定性七节报告。
+- 连续目标按适用性计算MAE、平方误差、Pinball、Coverage、Width和Winkler；分类目标计算Brier、Log Loss与方向正确性。滚动样本不足时不生成伪稳定性结论。
+- 区间失配或最高概率分类未实现时，只创建带证据、假设和必需回测的Research Queue候选，不能改写已发表预测或直接修改次日模型。
 
 ## 本地使用
 
@@ -78,5 +82,6 @@ runner安装脚本使用一次性注册token和下载包SHA256，并创建当前
 - `IMPLEMENTATION_STATUS_REVIEW.md`：真实完成状态、探针和限制
 - `REVIEW_USER_GUIDE.md`：日常操作和故障处理
 - `review_requirements_traceability.csv`：需求到代码、测试和证据的映射
+- `institutional-review.json`：每次运行的预测质量、交易质量、评分、监控和研究队列结构化工件
 
 自动化研究产出不构成投资建议。

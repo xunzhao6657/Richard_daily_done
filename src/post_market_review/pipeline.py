@@ -13,6 +13,7 @@ from .analysis import build_facts, deterministic_analysis, make_snapshot
 from .calendar import CalendarError, TradingCalendar
 from .comparison import compare_forecast, load_morning_forecast
 from .config import RuntimeConfig
+from .institutional import institutional_review
 from .report import build_document, render_all
 from .research import DeepSeekClient, ResearchError, evidence_dto, validate_research
 from .secrets import SecretUnavailable
@@ -86,8 +87,9 @@ def _prepare_failure(config: RuntimeConfig, report_date: date, mode: str, reason
     analysis = deterministic_analysis(None, facts, groups)
     comparisons = compare_forecast(None, None, {"reason": "NO_PUBLISHED_FORECAST"})
     evidence = evidence_dto(snapshot, facts, comparisons, session_next(config, report_date))
-    document = build_document(manifest, snapshot, facts, groups, analysis, comparisons, evidence, [], [], [])
-    return _stage(config, manifest, snapshot, evidence, document, [], [], ledger, clock)
+    institutional = institutional_review(None, comparisons)
+    document = build_document(manifest, snapshot, facts, groups, analysis, comparisons, evidence, [], [], [], institutional)
+    return _stage(config, manifest, snapshot, evidence, document, [], [], institutional, ledger, clock)
 
 
 def session_next(config: RuntimeConfig, report_date: date) -> str | None:
@@ -128,6 +130,7 @@ def prepare(config: RuntimeConfig, report_date: date, mode: str, clock: Callable
     facts, groups = build_facts(market)
     analysis = deterministic_analysis(market, facts, groups)
     comparisons = compare_forecast(morning, market, morning_state)
+    institutional = institutional_review(morning, comparisons)
     evidence = evidence_dto(snapshot, facts, comparisons, session.next_session.isoformat() if session.next_session else None)
     claims: list[dict[str, Any]] = []
     watch_items: list[dict[str, Any]] = []
@@ -155,9 +158,9 @@ def prepare(config: RuntimeConfig, report_date: date, mode: str, clock: Callable
     if market is not None:
         manifest["report_status"] = "PARTIAL"
     manifest["snapshot_hash"] = snapshot["snapshot_hash"]
-    document = build_document(manifest, snapshot, facts, groups, analysis, comparisons, evidence, claims, watch_items, rejections)
+    document = build_document(manifest, snapshot, facts, groups, analysis, comparisons, evidence, claims, watch_items, rejections, institutional)
     _update(ledger, manifest, "ANALYZED", clock)
-    return _stage(config, manifest, snapshot, evidence, document, rejections, watch_items, ledger, clock)
+    return _stage(config, manifest, snapshot, evidence, document, rejections, watch_items, institutional, ledger, clock)
 
 
 def _stage(
@@ -168,6 +171,7 @@ def _stage(
     document: dict[str, Any],
     rejections: list[str],
     watch_items: list[dict[str, Any]],
+    institutional: dict[str, Any],
     ledger: Ledger,
     clock: Callable[[], datetime],
 ) -> dict[str, Any]:
@@ -178,6 +182,7 @@ def _stage(
         "manifest": {key: value for key, value in manifest.items() if not key.endswith("_path")},
         "snapshot": snapshot,
         "evidence": evidence,
+        "institutional": institutional,
         "claim_rejections": rejections,
         "document_hash": sha256_json(document),
     }
@@ -198,9 +203,11 @@ def _stage(
     }
     handoff["handoff_hash"] = sha256_json(handoff)
     handoff_path = run_dir / "handoff.json"
+    institutional_path = run_dir / "institutional-review.json"
     atomic_write_json(audit_path, audit)
     atomic_write_json(handoff_path, handoff)
-    all_paths = {**paths, "audit": audit_path, "handoff": handoff_path}
+    atomic_write_json(institutional_path, institutional)
+    all_paths = {**paths, "audit": audit_path, "handoff": handoff_path, "institutional_review": institutional_path}
     hashes = {key: sha256_bytes(path.read_bytes()) for key, path in all_paths.items()}
     manifest["artifacts"] = {key: str(path) for key, path in all_paths.items()}
     manifest["artifact_hashes"] = hashes
@@ -356,8 +363,9 @@ def revalidate(config: RuntimeConfig, run_id: str, clock: Callable[[], datetime]
         "revalidation_only": True,
     }
     ledger.create_run(manifest)
-    document = build_document(manifest, snapshot, facts, groups, analysis, evidence["comparisons"], evidence, claims, watch_items, rejections)
-    return _stage(config, manifest, snapshot, evidence, document, rejections, watch_items, ledger, clock)
+    institutional = audit.get("institutional") or institutional_review(None, evidence["comparisons"])
+    document = build_document(manifest, snapshot, facts, groups, analysis, evidence["comparisons"], evidence, claims, watch_items, rejections, institutional)
+    return _stage(config, manifest, snapshot, evidence, document, rejections, watch_items, institutional, ledger, clock)
 
 
 def watchdog(config: RuntimeConfig, report_date: date, mode: str) -> dict[str, Any]:
