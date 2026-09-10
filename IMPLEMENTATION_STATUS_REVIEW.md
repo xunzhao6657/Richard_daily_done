@@ -50,7 +50,7 @@
 - self-hosted runner `LAPTOP-B1VMJBGF-richard-daily` 已在线，标签为 `self-hosted`、`Windows`、`X64`、`post-market-review`。
 - 首次验证发现 `setup-python` 在低权限runner上等待系统安装，因此已取消该运行；工作流改用 `PYTHON_EXE` 指向已验证的本机运行时，避免每日管理员安装与解释器下载。
 - 第二次验证发现系统只有Windows PowerShell，工作流已改用 `powershell`；随后把合同测试状态与生产账本隔离，避免测试读到历史发布记录。
-- GitHub doctor运行 [`34440514850`](https://github.com/xunzhao6657/Richard_daily_done/actions/runs/34440514850) 已成功完成：检出、Python、锁定依赖、11项合同测试、北京时间路由、DPAPI、Wind入口、状态目录和DeepSeek真实探测全部通过。Institutional Quant升级提交后的12项测试和在线复验记录将在本次发布后更新。
+- GitHub doctor运行 [`34469700847`](https://github.com/xunzhao6657/Richard_daily_done/actions/runs/34469700847) 已在Institutional Quant升级提交 `1100801` 上成功完成：检出、Python、锁定依赖、12项合同测试、北京时间路由、DPAPI、Wind入口、状态目录和DeepSeek真实探测全部通过。
 - runner在成功作业后已恢复 `online` 且空闲；连续3个适用交易日观察仍未完成。
 
 专业能力以可核验证据、透明缺失和可重放规则为准，测试通过不代表投资判断经过收益验证。
