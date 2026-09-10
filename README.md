@@ -54,6 +54,7 @@ CLI支持 `doctor`、`collect`、`prepare`、`publish`、`watchdog`、`run`、`s
 
 |变量|建议值|
 |---|---|
+|`PYTHON_EXE`|runner上已验证的Python 3.11或更高版本绝对路径|
 |`WIND_CLI_PATH`|`C:\Users\<账户>\.agents\skills\wind-mcp-skill\scripts\cli.mjs`|
 |`DEEPSEEK_SECRET_FILE`|当前runner账户可解密的仓库外DPAPI文件|
 |`DEEPSEEK_BUDGET_ROOT`|晨报与复盘共享的账户级预算目录|

@@ -1,6 +1,6 @@
 param(
     [string]$RepositoryUrl = 'https://github.com/xunzhao6657/Richard_daily_done',
-    [string]$RunnerRoot = 'E:\github-actions-runner-richard-daily',
+    [string]$RunnerRoot = 'E:\finance agent\finance\github-actions-runner-richard-daily',
     [string]$RunnerVersion = '2.337.0',
     [Parameter(Mandatory=$true)]
     [string]$PackageSha256,

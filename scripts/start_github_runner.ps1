@@ -1,5 +1,5 @@
 param(
-    [string]$RunnerRoot = 'E:\github-actions-runner-richard-daily'
+    [string]$RunnerRoot = 'E:\finance agent\finance\github-actions-runner-richard-daily'
 )
 $ErrorActionPreference = 'Stop'
 $RunCommand = Join-Path $RunnerRoot 'run.cmd'
