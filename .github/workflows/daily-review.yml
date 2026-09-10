@@ -69,21 +69,21 @@ jobs:
         with:
           persist-credentials: false
       - name: Validate pinned local Python
-        shell: pwsh
+        shell: powershell
         run: |
           if (-not (Test-Path -LiteralPath $env:PYTHON_EXE -PathType Leaf)) { throw 'PYTHON_EXE is missing.' }
           & $env:PYTHON_EXE -c "import sys; assert sys.version_info >= (3, 11)"
       - name: Install locked dependencies
-        shell: pwsh
+        shell: powershell
         run: |
           & $env:PYTHON_EXE -m pip install --disable-pip-version-check -r requirements.lock
       - name: Run contract tests
-        shell: pwsh
+        shell: powershell
         run: '& $env:PYTHON_EXE -m unittest discover -s tests'
 
       - name: Resolve Beijing date and stage
         id: route
-        shell: pwsh
+        shell: powershell
         run: |
           $stage = "${{ inputs.action }}"
           $mode = "${{ inputs.mode }}"
@@ -104,12 +104,13 @@ jobs:
               default { 'status' }
             }
           }
-          "stage=$stage" | Add-Content -LiteralPath $env:GITHUB_OUTPUT -Encoding utf8
-          "mode=$mode" | Add-Content -LiteralPath $env:GITHUB_OUTPUT -Encoding utf8
-          "report_date=$reportDate" | Add-Content -LiteralPath $env:GITHUB_OUTPUT -Encoding utf8
+          $utf8 = New-Object Text.UTF8Encoding($false)
+          [IO.File]::AppendAllText($env:GITHUB_OUTPUT, "stage=$stage`n", $utf8)
+          [IO.File]::AppendAllText($env:GITHUB_OUTPUT, "mode=$mode`n", $utf8)
+          [IO.File]::AppendAllText($env:GITHUB_OUTPUT, "report_date=$reportDate`n", $utf8)
 
       - name: Execute stage
-        shell: pwsh
+        shell: powershell
         run: |
           $stage = '${{ steps.route.outputs.stage }}'
           $reportDate = '${{ steps.route.outputs.report_date }}'
