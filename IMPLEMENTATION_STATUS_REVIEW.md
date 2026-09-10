@@ -37,14 +37,16 @@
 - 行业榜是Wind行业板块口径，尚未验证为申万一级全样本，报告明确保留该限制。
 - 新闻、公告、两融、北向和港股数据集未登记为本版本自动源，对应能力不补写。
 - 当前只有一次真实影子报告，尚未完成连续3个适用交易日的定时稳定性观察，因此不能声明调度SLA已验收。
-- GitHub runner、仓库Variables和默认分支Actions需要以仓库网页实际状态为准；部署完成后在本文件追加在线状态与首个workflow run。
+- GitHub runner、仓库Variables和默认分支Actions已经完成实机验收；仍需以连续交易日观察确认长期调度稳定性。
 
 ## GitHub在线部署
 
 - 仓库：`xunzhao6657/Richard_daily_done`，默认分支 `main`。
 - Actions workflow已启用，默认令牌权限为只读且不能批准PR。
 - self-hosted runner `LAPTOP-B1VMJBGF-richard-daily` 已在线，标签为 `self-hosted`、`Windows`、`X64`、`post-market-review`。
-- 首次验证发现 `setup-python` 在低权限runner上等待系统安装，因此已取消该运行；工作流改用 `PYTHON_EXE` 指向已验证的本机隔离运行时，避免每日管理员安装与解释器下载。
-- 正在等待修订后的GitHub doctor运行完成；连续3个交易日观察仍未完成。
+- 首次验证发现 `setup-python` 在低权限runner上等待系统安装，因此已取消该运行；工作流改用 `PYTHON_EXE` 指向已验证的本机运行时，避免每日管理员安装与解释器下载。
+- 第二次验证发现系统只有Windows PowerShell，工作流已改用 `powershell`；随后把合同测试状态与生产账本隔离，避免测试读到历史发布记录。
+- GitHub doctor运行 [`34440514850`](https://github.com/xunzhao6657/Richard_daily_done/actions/runs/34440514850) 已成功完成：检出、Python、锁定依赖、11项合同测试、北京时间路由、DPAPI、Wind入口、状态目录和DeepSeek真实探测全部通过。
+- runner在成功作业后已恢复 `online` 且空闲；连续3个适用交易日观察仍未完成。
 
 专业能力以可核验证据、透明缺失和可重放规则为准，测试通过不代表投资判断经过收益验证。
