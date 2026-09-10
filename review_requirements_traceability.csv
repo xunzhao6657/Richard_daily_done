@@ -32,5 +32,5 @@ PG03,Pages静态站点构建,scripts/build_pages.py,空目录/单类/双类/跨�
 PG04,Latest分别选择晨报和复盘,scripts/build_pages.py,test_latest_is_selected_independently_for_each_kind,PASS
 PG05,Project Pages相对链接,scripts/build_pages.py,test_project_pages_links_are_relative_and_resolve,PASS
 PG06,敏感文件与主动内容拦截,scripts/archive_pages_reports.py,test_sensitive_html_is_rejected,PASS
-PG07,官方Pages Actions独立部署,.github/workflows/pages.yml,GitHub在线部署验收待执行,IMPLEMENTED_PENDING_ONLINE
-PG08,晨报08:05和复盘完成后自动归档,.github/workflows/archive-reports.yml,workflow schedule/workflow_run/manual,IMPLEMENTED_PENDING_ONLINE
+PG07,官方Pages Actions独立部署,.github/workflows/pages.yml,Actions run 34502143620 and HTTP 200 checks,PASS_ONLINE
+PG08,晨报08:05和复盘完成后自动归档,.github/workflows/archive-reports.yml,Actions run 34502211684; schedule/workflow_run/manual,PASS_ONLINE

@@ -42,6 +42,8 @@ Quant层与Pages层相互独立。Pages失败不改变报告、Forecast、Valida
 
 晨报与复盘分别选择各自最新日期。某类报告完全不存在时，固定地址显示友好占位页而不是404。
 
+仓库Pages来源已于2026-09-11通过GitHub API设置为GitHub Actions，用户无需再到 `Settings -> Pages` 手动切换。
+
 ## 手动恢复
 
 在Actions中先运行 `Archive sanitized reports`，再运行 `Deploy reports to GitHub Pages`。如果归档失败，查看被拒绝的具体HTML及规则；不要关闭敏感信息检查。若Pages部署失败，原报告和Artifact仍然有效，可在修复展示层后重新部署。

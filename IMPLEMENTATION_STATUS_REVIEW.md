@@ -15,7 +15,9 @@
 - 已实现七节同文档树导出Markdown、HTML和DOCX，HTML与Word使用涨红跌绿和箭头；Word四页完成逐页视觉检查。
 - 已实现READY、唯一发布、文件不覆盖、20:00至21:00发布窗口、watchdog、离线重放、离线重校验、交接包和SQLite完整性备份。
 - 已实现GitHub Actions六阶段UTC调度和Windows self-hosted runner运维脚本，workflow最小权限且只上传净化outbox。
-- 自动测试12项通过，覆盖A01、A02、A03、A04、A05、A07、A08、A10、A11、A13、A15和A19的核心条件，并验证DeepSeek后端标识白名单、`forecast.v2`单位换算、区间评分和方向分类分支。
+- 已将完整Institutional Quant提示词及Pages实施需求按SHA-256归档；运行短Prompt增加公开分发边界，保持严格JSON输出契约。
+- 已上线统一GitHub Pages门户。Windows归档层只提交已发布、哈希一致、非`test`且通过安全扫描的最终HTML；Ubuntu展示层从完整历史无状态重建站点。
+- 自动测试23项通过：原12项业务合同测试不变，新增11项Pages测试覆盖空目录、单类/双类报告、跨月、跨年、中文文件名、无关HTML、Latest选择、Project Pages链接和敏感内容拒绝。
 
 ## 真实验收记录
 
@@ -46,11 +48,13 @@
 ## GitHub在线部署
 
 - 仓库：`xunzhao6657/Richard_daily_done`，默认分支 `main`。
-- Actions workflow已启用，默认令牌权限为只读且不能批准PR。
+- 原复盘Workflow保持`contents: read`且不能批准PR；独立归档Workflow仅为提交`published-reports/`使用`contents: write`；Pages Workflow使用官方`pages: write`与OIDC权限。
 - self-hosted runner `LAPTOP-B1VMJBGF-richard-daily` 已在线，标签为 `self-hosted`、`Windows`、`X64`、`post-market-review`。
 - 首次验证发现 `setup-python` 在低权限runner上等待系统安装，因此已取消该运行；工作流改用 `PYTHON_EXE` 指向已验证的本机运行时，避免每日管理员安装与解释器下载。
 - 第二次验证发现系统只有Windows PowerShell，工作流已改用 `powershell`；随后把合同测试状态与生产账本隔离，避免测试读到历史发布记录。
 - GitHub doctor运行 [`34469700847`](https://github.com/xunzhao6657/Richard_daily_done/actions/runs/34469700847) 已在Institutional Quant升级提交 `1100801` 上成功完成：检出、Python、锁定依赖、12项合同测试、北京时间路由、DPAPI、Wind入口、状态目录和DeepSeek真实探测全部通过。
+- Pages来源已通过GitHub API设置为`workflow`，无需手工修改Settings。首次部署 [`34502143620`](https://github.com/xunzhao6657/Richard_daily_done/actions/runs/34502143620) 成功，首页、Latest晨报、Latest复盘和历史复盘均返回HTTP 200，Latest文件SHA-256与本地发布登记值一致。
+- 独立归档Workflow手动验收 [`34502211684`](https://github.com/xunzhao6657/Richard_daily_done/actions/runs/34502211684) 成功；当前公开历史包含2份晨报和1份复盘。
 - runner在成功作业后已恢复 `online` 且空闲；连续3个适用交易日观察仍未完成。
 
 专业能力以可核验证据、透明缺失和可重放规则为准，测试通过不代表投资判断经过收益验证。
